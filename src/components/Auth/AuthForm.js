@@ -4,6 +4,7 @@ import classes from './AuthForm.module.css';
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const emailRef = useRef();
     const passwordRed = useRef();
     const switchAuthModeHandler = () => {
@@ -14,7 +15,7 @@ const AuthForm = () => {
         e.preventDefault();
         const enteredEmail = emailRef.current.value;
         const enteredPassword = passwordRed.current.value;
-
+        setIsLoading(true);
         if (isLogin) {
         } else {
             const sendingData = await fetch(
@@ -29,15 +30,23 @@ const AuthForm = () => {
                     header: { 'content-type': 'application/json' },
                 },
             );
-            
-                if (sendingData.ok) {
-                } else {
-                    const errorMsg = await sendingData.json();
-                    // throw new Error(errorMsg);
-                }
-            
+            setIsLoading(false);
+            if (sendingData.ok) {
+            } else {
+                const errorBody = await sendingData.json();
+                // console.log(errorBody);
+                const errorMsg = errorBody.error.message;
+                // console.log(errorMsg);
 
-            console.log(sendingData);
+                let errorMessage = 'Auth failing';
+
+                if (errorMsg && errorMsg.error && errorMsg.error.message) {
+                    errorMessage = errorMsg.error.message;
+                }
+                alert(errorMessage);
+            }
+
+            // console.log(sendingData);
             // const data = await sendingData.json()
         }
     };
@@ -60,7 +69,12 @@ const AuthForm = () => {
                     />
                 </div>
                 <div className={classes.actions}>
-                    <button>{isLogin ? 'Login' : 'Create Account'}</button>
+                    {!isLoading ? (
+                        <button>{isLogin ? 'Login' : 'Create Account'}</button>
+                    ) : (
+                        <p>Loading</p>
+                    )}
+
                     <button
                         type="button"
                         className={classes.toggle}
