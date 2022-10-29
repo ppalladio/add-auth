@@ -59,7 +59,7 @@ const AuthForm = () => {
             })
             .then((data) => {
                 // console.log(data);
-                ctx.logIn(data.idToken)
+                ctx.login(data.idToken)
                 history.push('/')
             })
             .catch((err) => {
